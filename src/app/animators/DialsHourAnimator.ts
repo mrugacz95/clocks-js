@@ -1,7 +1,9 @@
-import { Animator } from "./Animator" 
-import { State } from "./Animator" 
+import { Animator } from "./Animator"
+import { State } from "./Animator"
 
-export class HourAnimator implements Animator  {
+export class DialsHourAnimator implements Animator {
+    freezeTime = 1.5
+
     nextState(rows: number, columns: number): State[][] {
         var today = new Date();
         var hours = today.getHours()
@@ -10,18 +12,20 @@ export class HourAnimator implements Animator  {
         var minRotation = minutes / 60 * 2 * Math.PI;
 
         let output: State[][] = []
-        for(let y  =0 ; y< rows;y++){
+        for (let y = 0; y < rows; y++) {
             output[y] = []
             for (let x = 0; x < columns; x++) {
-                output[y][x] = new State(hourRotation , minRotation)      
+                output[y][x] = new State(hourRotation, minRotation)
             }
         }
         return output
     }
+
     hasFinished(): boolean {
         return true
     }
-    restart() {
+
+    restart(rows: number, columns: number): void {
         // nop
     }
 }

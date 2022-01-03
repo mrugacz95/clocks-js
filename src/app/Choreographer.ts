@@ -8,6 +8,8 @@ export class Choreographer {
     fps: number = 30
     currentState: State[][]
     maxSpeed: number = (2 * Math.PI / 15) / (this.fps) // 15 sec for full turn
+    nextAnimatorTime ?: number
+    freezeTime : number = 0.5
 
     constructor(animators: Animator[], wallClock: WallClock) {
         this.animators = animators
@@ -19,13 +21,22 @@ export class Choreographer {
     start() {
         let state = this.nextState()
         this.wallClock.draw(state)
-        setTimeout(() => { this.start() }, 1000 / this.fps)
+        setTimeout(() => { this.start() }, 1000 * this.freezeTime / this.fps)
     }
 
     private nextState(): State[][] {
         let { nextState, moving } = this.interpolate(this.animators[this.state].nextState(this.wallClock.rows, this.wallClock.columns))
         if (this.animators[this.state].hasFinished() && moving == false) {
+            if (this.nextAnimatorTime == null){
+                this.nextAnimatorTime = new Date().getTime() + 1000 * this.animators[this.state].freezeTime
+                return this.currentState
+            }
+            else if (this.nextAnimatorTime > new Date().getTime()){
+                return this.currentState
+            }
+            this.animators[this.state].restart(this.wallClock.rows, this.wallClock.columns)
             this.state = (this.state + 1) % this.animators.length
+            this.nextAnimatorTime = null
         }
         this.currentState = nextState
         return nextState
@@ -39,10 +50,10 @@ export class Choreographer {
                 let newState = newClockState[y][x]
                 let currentState = this.currentState[y][x]
                 let { interpolatedValue, changed } = this.intepolateValue(currentState.hourRotation, newState.hourRotation)
-                interpolated[y][x].hourRotation = interpolatedValue
+                interpolated[y][x] = interpolated[y][x].setHourRotation(interpolatedValue)
                 moving ||= changed;
                 ({ interpolatedValue, changed } = this.intepolateValue(currentState.minRotation, newState.minRotation))
-                interpolated[y][x].minRotation = interpolatedValue
+                interpolated[y][x] = interpolated[y][x].setMinRotation(interpolatedValue)
                 moving ||= changed
             }
         }
@@ -75,18 +86,6 @@ export class Choreographer {
             }
         }
         result = oldValue + sign * this.maxSpeed
-        return { interpolatedValue: (result + 2 * Math.PI) % (2 * Math.PI), changed: true }// keep 2pi range
-
-
-        // if (oldValue < newValue) {
-        //     return {
-        //         interpolatedValue: (oldValue + this.maxSpeed + 2 * Math.PI) % (2 * Math.PI),
-        //         changed: true
-        //     }
-        // }
-        // return {
-        //     interpolatedValue: (oldValue - this.maxSpeed + 2 * Math.PI) % (2 * Math.PI),
-        //     changed: true
-        // }
+        return { interpolatedValue: (result + 2 * Math.PI) % (2 * Math.PI), changed: true } // keep 2pi range
     }
 }

@@ -8,7 +8,7 @@ module.exports = {
     filename: 'bundle.js',
     publicPath: '/'
   },
-  mode: 'development',
+  mode: isProduction ? 'production' : 'development',
   module: {
     rules: [
       {
@@ -34,9 +34,7 @@ module.exports = {
             presets: ['@babel/preset-env'],
           },
         },
-        exclude: [
-          /node_modules/
-        ]
+        exclude: /node_modules/
       }
     ]
   },
