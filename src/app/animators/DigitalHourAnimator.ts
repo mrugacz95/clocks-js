@@ -3,21 +3,40 @@ import { Vector } from "../geometry/Vector"
 
 export class DigitalHourAnimator extends Animator {
     freezeTime = 2.5
-    numbers: { [num: number]: Vector[] } = { // ids of connected clock dials
-        1: [[0, 1], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 1]].map((arr) => new Vector(arr[0], arr[1])),
-        2: [[0, 0], [0, 2], [3, 2], [3, 1], [4, 1], [4, 2], [5, 2], [5, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        3: [[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        // 4: [[0, 0], [0, 1], [2, 1], [2, 1] , [0,1], [0,2], [5, 2], [5,1], [3,1], [3,0], [0,0]].map((arr) => new Vector(arr[0], arr[1])),
-        4: [[0, 2], [5, 2], [5, 1], [3, 1], [3, 0], [2, 0], [0, 2]].map((arr) => new Vector(arr[0], arr[1])),
-        5: [[0, 0], [3, 0], [3, 1], [4, 1], [4, 0], [5, 0], [5, 2], [2, 2], [2, 1], [1, 1], [1, 2], [0, 2], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        6: [[0, 0], [5, 0], [5, 2], [2, 2], [2, 1], [1, 1], [1, 2], [0, 2], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        7: [[0, 0], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        8: [[0, 0], [0, 2], [5, 2], [5, 1], [1, 1], [5, 1], [5, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        9: [[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-        0: [[0, 0], [0, 2], [5, 2], [5, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
-
-
-    }
+    numbers: { [num: number]: Vector[][] } = Object.entries({ // ids of connected clock dials
+        1: [[[0, 1], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 1]]],
+        2: [[[0, 0], [0, 2], [3, 2], [3, 1], [4, 1], [4, 2], [5, 2], [5, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]]],
+        3: [[[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]]],
+        4: [[[0, 0], [0, 1], [2, 1], [2, 1] , [0,1], [0,2], [5, 2], [5,1], [3,1], [3,0], [0,0]]],
+        // 4: [[[0, 2], [5, 2], [5, 1], [3, 1], [3, 0], [2, 0], [0, 2]]],
+        5: [[[0, 0], [3, 0], [3, 1], [4, 1], [4, 0], [5, 0], [5, 2], [2, 2], [2, 1], [1, 1], [1, 2], [0, 2], [0, 0]]],
+        6: [
+            [[0, 0], [5, 0], [5, 2], [2, 2], [2, 1], [1, 1], [1, 2], [0, 2], [0, 0]],
+            [[3, 1], [4, 1], [3, 1]]
+        ],
+        7: [[[0, 0], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 0]]],
+        8: [
+            [[0, 0], [0, 2], [5, 2], [5, 1], [5, 0], [0, 0]],
+            [[1, 1], [2, 1], [1, 1]],
+            [[3, 1], [4, 1], [3, 1]],
+        ],
+        // 8: [
+        //     [[0, 1], [1, 2], [3, 1], [1, 0], [0, 1]],
+        //     [[5, 1], [3, 0], [2, 1], [3, 2], [5, 1]],
+        //     [[1, 1], [2, 1], [1, 1]],
+        //     [[3, 1], [4, 1], [3, 1]],
+        // ],
+        9: [[[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [0, 0]]],
+        0: [
+            [[0, 0], [0, 2], [5, 2], [5, 0], [0, 0]],
+            [[1, 1], [4, 1], [1, 1]]
+        ],
+    }).reduce((map, entry: [string, number[][][]]) => {
+        let [key, value] = entry
+        map[parseInt(key)] = value.map((line) =>
+            line.map((point) => new Vector(point[0], point[1])))
+        return map;
+    }, {} as { [num: number]: Vector[][] })
 
     cache: State[][]
     cacheDate: Date
@@ -36,8 +55,8 @@ export class DigitalHourAnimator extends Animator {
         this.drawNumber(new Vector(1, 8), parseInt(minutes[0]), initial)
         this.drawNumber(new Vector(1, 11), parseInt(minutes[1]), initial)
         // initial[2][7] = new State(State.DOWN, State.DOWN)
-        initial[3][7] = new State(Math.PI / 4, Math.PI * 7 / 4)
-        initial[4][7] = new State(Math.PI * 3 / 4, Math.PI * 5 / 4)
+        initial[3][7] = new State(Angle.UP, Angle.UP)
+        initial[4][7] = new State(Angle.UP, Angle.UP)
         // initial[5][7] = new State(State.UP, State.UP)
 
         this.cache = initial
@@ -46,9 +65,10 @@ export class DigitalHourAnimator extends Animator {
 
     drawNumber(d: Vector, number: number, state: State[][]) {
         let lines = this.numbers[number]
-        for (let i = 0; i < lines.length - 1; i++) {
-            this.drawLine(lines[i].add(d), lines[i + 1].add(d), state)
-        }
+        for (let lineId = 0; lineId < lines.length; lineId += 1)
+            for (let pointId = 0; pointId < lines[lineId].length - 1; pointId++) {
+                this.drawLine(lines[lineId][pointId].add(d), lines[lineId][pointId + 1].add(d), state)
+            }
     }
 
     hasFinished(): boolean {
