@@ -4,6 +4,8 @@ import { Choreographer } from './Choreographer'
 export class WallClock {
     root: HTMLCanvasElement
     ctx: CanvasRenderingContext2D
+    backgroundCtx: CanvasRenderingContext2D
+    backgroundDrawn: boolean = false
     width: number
     height: number
     columns: number = 15
@@ -15,9 +17,11 @@ export class WallClock {
     wallStartY: number
     choreographer: Choreographer
     running: boolean = false
+    afterFirstDraw = false
 
-    constructor(root: HTMLCanvasElement, animators: Animator[]) {
+    constructor(root: HTMLCanvasElement, background: HTMLCanvasElement, animators: Animator[]) {
         this.root = root
+        this.backgroundCtx = background.getContext("2d")
         this.ctx = this.root.getContext("2d")
         this.width = this.root.width
         this.height = this.root.height
@@ -25,9 +29,14 @@ export class WallClock {
         this.height = this.rows * this.singleClockSize + (this.rows - 1) * this.dividerSize + 2 * this.margin
         this.root.width = window.innerWidth;
         this.root.height = window.innerHeight;
+        background.width = window.innerWidth
+        background.height = window.innerHeight
         this.wallStartX = this.root.width / 2 - this.width / 2
         this.wallStartY = this.root.height / 2 - this.height / 2
         this.choreographer = new Choreographer(animators, this)
+        animators.forEach((animator: Animator) => {
+            animator.init(this.rows, this.columns)
+        })
     }
 
     start() {
@@ -39,68 +48,79 @@ export class WallClock {
         this.choreographer.start()
     }
 
+    drawBackground() {
+        if (this.backgroundDrawn == false) {
+            this.drawBoard(this.backgroundCtx)
+            this.drawDials(this.backgroundCtx)
+            this.backgroundDrawn = true
+        }
+    }
+
     draw(nextState: State[][]) {
+        this.drawBackground()
         this.ctx.clearRect(0, 0, this.root.width, this.root.height);
-        this.drawBoard()
-        this.drawDials()
+        this.ctx.save()
+        this.afterFirstDraw = true
+        this.ctx.restore()
+        this.ctx.save()
         this.drawArrows(nextState)
     }
 
-    drawBoard() {
-        this.ctx.shadowBlur = 25;
-        this.ctx.shadowOffsetX = 15;
-        this.ctx.shadowOffsetY = 15;
-        this.ctx.shadowColor = "#9d9d9d";
+    drawBoard(ctx: CanvasRenderingContext2D) {
+        ctx.shadowBlur = 25;
+        ctx.shadowOffsetX = 15;
+        ctx.shadowOffsetY = 15;
+        ctx.shadowColor = "#9d9d9d";
 
-        this.ctx.fillStyle = "#ffffff";
-        this.ctx.fillRect(this.wallStartX, this.wallStartY, this.width, this.height);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(this.wallStartX, this.wallStartY, this.width, this.height);
 
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        this.ctx.shadowColor = "#f2f2f2";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowColor = "#f2f2f2";
     }
 
-    drawDials() {
+    drawDials(ctx: CanvasRenderingContext2D) {
         for (let y = 0; y < this.rows; y++) {
             for (let x = 0; x < this.columns; x++) {
-                this.ctx.shadowBlur = 0;
-                this.ctx.shadowOffsetX = 0;
-                this.ctx.shadowOffsetY = 0;
-                this.ctx.shadowColor = "#fff";
-                this.ctx.strokeStyle = "#fff"
-                this.ctx.lineWidth = 0;
-                this.ctx.save()
-                this.ctx.beginPath();
-                this.ctx.arc(
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowColor = "#fff";
+                ctx.strokeStyle = "#fff"
+                ctx.lineWidth = 0;
+                ctx.save()
+                ctx.beginPath();
+                ctx.arc(
                     x * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartX + this.margin,
                     y * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartY + this.margin,
                     this.singleClockSize / 2,
                     0,
                     2 * Math.PI);
-                this.ctx.clip()
+                ctx.clip()
 
-                this.ctx.beginPath();
-                this.ctx.fillStyle = "#000";
-                this.ctx.shadowBlur = 8;
-                this.ctx.shadowOffsetX = 5;
-                this.ctx.shadowOffsetY = 0;
-                this.ctx.shadowColor = "#000";
-                this.ctx.arc(
+                ctx.beginPath();
+                ctx.fillStyle = "#000";
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowColor = "#000";
+                ctx.arc(
                     x * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartX + this.margin + 5,
                     y * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartY + this.margin,
                     this.singleClockSize / 1.5,
                     0,
                     2 * Math.PI);
-                this.ctx.stroke();
-                this.ctx.restore()
+                ctx.stroke();
+                ctx.restore()
             }
         }
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        this.ctx.shadowColor = "#f2f2f2";
-        this.ctx.lineWidth = 0;
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowColor = "#f2f2f2";
+        ctx.lineWidth = 0;
     }
 
     drawArrows(states: State[][]) {
@@ -114,12 +134,12 @@ export class WallClock {
                 let state = states[y][x]
                 let clockXCenter = x * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartX + this.margin;
                 let clockYCenter = y * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartY + this.margin
-                let { arrowY, arrowX } = this.rotateArrow(this.singleClockSize / 2 - 1, state.minRotation)
+                let {arrowY, arrowX} = this.rotateArrow(this.singleClockSize / 2 - 1, state.minRotation)
                 this.ctx.beginPath();
                 this.ctx.moveTo(clockXCenter, clockYCenter);
                 this.ctx.lineTo(arrowX + clockXCenter, arrowY + clockYCenter);
 
-                ({ arrowY, arrowX } = this.rotateArrow(this.singleClockSize / 3, state.hourRotation));
+                ({arrowY, arrowX} = this.rotateArrow(this.singleClockSize / 3, state.hourRotation));
                 this.ctx.moveTo(clockXCenter, clockYCenter);
                 this.ctx.lineTo(arrowX + clockXCenter, arrowY + clockYCenter)
                 this.ctx.stroke()
@@ -142,6 +162,6 @@ export class WallClock {
     rotateArrow(length: number, rotation: number): { arrowY: number, arrowX: number } {
         let arrowX = length * Math.sin(rotation)
         let arrowY = -length * Math.cos(rotation)
-        return { arrowY, arrowX }
+        return {arrowY, arrowX}
     }
 } 

@@ -1,28 +1,29 @@
 import { Animator, State } from "./Animator";
 
-export class LinesAnimator implements Animator {
+export class LinesAnimator extends Animator {
     state: State
-    freezeTime: number
-    constructor(state: State, freezeTime = 0.5) {
+
+    constructor(state: State, freezeTime = 0) {
+        super(freezeTime);
         this.state = state
-        this.freezeTime = freezeTime
     }
 
-    nextState(rows: number, columns: number): State[][] {
+    nextState(): State[][] {
         let output: State[][] = []
-        for (let y = 0; y < rows; y++) {
+        for (let y = 0; y < this.rows; y++) {
             output[y] = []
-            for (let x = 0; x < columns; x++) {
+            for (let x = 0; x < this.columns; x++) {
                 output[y][x] = this.state
             }
         }
         return output
     }
+
     hasFinished(): boolean {
         return true
     }
 
-    restart(rows: number, columns: number): void {
+    restart(): void {
         // nop
     }
 

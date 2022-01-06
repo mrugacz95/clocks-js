@@ -1,8 +1,8 @@
-import { Animator, State } from "./Animator";
+import { Angle, Animator, State } from "./Animator";
 import { Vector } from "../geometry/Vector"
 
-export class DigitalHourAnimator implements Animator {
-    freezeTime = 5
+export class DigitalHourAnimator extends Animator {
+    freezeTime = 2.5
     numbers: { [num: number]: Vector[] } = { // ids of connected clock dials
         1: [[0, 1], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 1]].map((arr) => new Vector(arr[0], arr[1])),
         2: [[0, 0], [0, 2], [3, 2], [3, 1], [4, 1], [4, 2], [5, 2], [5, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]].map((arr) => new Vector(arr[0], arr[1])),
@@ -19,25 +19,25 @@ export class DigitalHourAnimator implements Animator {
 
     }
 
-    cache : State[][]
-    cacheDate : Date
+    cache: State[][]
+    cacheDate: Date
 
-    nextState(rows: number, columns: number): State[][] {
+    nextState(): State[][] {
         let today = new Date();
-        if (this.cacheDate == today){
+        if (this.cacheDate == today) {
             return this.cache
         }
         let hours = today.getHours().toString().padStart(2, '0');
         let minutes = today.getMinutes().toString().padStart(2, '0');
-        let initial = State.createClocksState(rows, columns)
+        let initial = State.createClocksState(this.rows, this.columns)
 
         this.drawNumber(new Vector(1, 1), parseInt(hours[0]), initial)
         this.drawNumber(new Vector(1, 4), parseInt(hours[1]), initial)
         this.drawNumber(new Vector(1, 8), parseInt(minutes[0]), initial)
         this.drawNumber(new Vector(1, 11), parseInt(minutes[1]), initial)
         // initial[2][7] = new State(State.DOWN, State.DOWN)
-        initial[3][7] = new State(State.UP, State.UP)
-        initial[4][7] = new State(State.DOWN, State.DOWN)
+        initial[3][7] = new State(Math.PI / 4, Math.PI * 7 / 4)
+        initial[4][7] = new State(Math.PI * 3 / 4, Math.PI * 5 / 4)
         // initial[5][7] = new State(State.UP, State.UP)
 
         this.cache = initial
@@ -55,7 +55,7 @@ export class DigitalHourAnimator implements Animator {
         return true
     }
 
-    restart(rows: number, columns: number): void {
+    restart(): void {
         // nop
     }
 
@@ -78,13 +78,13 @@ export class DigitalHourAnimator implements Animator {
         let dx = p1.x - p0.x
         let dy = p1.y - p0.y
         let yi = 1
-        let slopeMinRot = Math.PI * 3 / 4
-        let slopeHourRot = Math.PI * 7 / 4
+        let slopeMinRot = Angle.DOWN_RIGHT
+        let slopeHourRot = Angle.UP_LEFT
         if (dy < 0) {
             yi = -1
             dy = -dy
-            slopeMinRot = Math.PI / 4
-            slopeHourRot = Math.PI * 5 / 4
+            slopeMinRot = Angle.UP_RIGHT
+            slopeHourRot = Angle.DOWN_LEFT
         }
         let D = (2 * dy) - dx
         let y = p0.y
@@ -95,15 +95,15 @@ export class DigitalHourAnimator implements Animator {
             let first = x == p0.x
             let last = x == p1.x
             if (D > 0) {
-                hourRot = changed ? slopeHourRot : State.LEFT
+                hourRot = changed ? slopeHourRot : Angle.LEFT
                 minRot = slopeMinRot
                 this.setLineState(y, x, hourRot, minRot, first, last, state, direction)
                 changed = true
                 y = y + yi;
                 D = D + (2 * (dy - dx))
             } else {
-                hourRot = changed ? slopeHourRot : State.LEFT
-                minRot = State.RIGHT
+                hourRot = changed ? slopeHourRot : Angle.LEFT
+                minRot = Angle.RIGHT
                 this.setLineState(y, x, hourRot, minRot, first, last, state, direction)
                 changed = false
                 D = D + 2 * dy
@@ -115,13 +115,13 @@ export class DigitalHourAnimator implements Animator {
         let dx = p1.x - p0.x
         let dy = p1.y - p0.y
         let xi = 1
-        let slopeHourRot = Math.PI * 7 / 4
-        let slopeMinRot = Math.PI * 3 / 4
+        let slopeHourRot = Angle.UP_LEFT
+        let slopeMinRot = Angle.DOWN_RIGHT
         if (dx < 0) {
             xi = -1
             dx = -dx
-            slopeHourRot = Math.PI / 4
-            slopeMinRot = Math.PI * 5 / 4
+            slopeHourRot = Angle.UP_RIGHT
+            slopeMinRot = Angle.DOWN_LEFT
         }
         let D = (2 * dx) - dy
         let x = p0.x
@@ -132,15 +132,15 @@ export class DigitalHourAnimator implements Animator {
             let first = y == p0.y
             let last = y == p1.y
             if (D > 0) {
-                hourRot = changed ? slopeHourRot : State.UP
+                hourRot = changed ? slopeHourRot : Angle.UP
                 minRot = slopeMinRot
                 changed = true
                 this.setLineState(y, x, hourRot, minRot, first, last, state, direction)
                 x = x + xi;
                 D = D + (2 * (dx - dy))
             } else {
-                hourRot = changed ? slopeHourRot : State.UP
-                minRot = State.DOWN
+                hourRot = changed ? slopeHourRot : Angle.UP
+                minRot = Angle.DOWN
                 this.setLineState(y, x, hourRot, minRot, first, last, state, direction)
                 changed = false
                 D = D + 2 * dx

@@ -5,17 +5,21 @@ export class Choreographer {
     animators: Animator[]
     state: number
     wallClock: WallClock
-    fps: number = 30
+    fps: number = 120
     currentState: State[][]
-    maxSpeed: number = (2 * Math.PI / 15) / (this.fps) // 15 sec for full turn
+    targetState: State[][]
+    speed: number = (2 * Math.PI / 15)  // 15 sec for full turn
+    minAngleDiff: number  = this.speed / this.fps
     nextAnimatorTime ?: number
     freezeTime : number = 0.5
+    achievedTargetState = false
 
     constructor(animators: Animator[], wallClock: WallClock) {
         this.animators = animators
         this.state = 0
         this.wallClock = wallClock
         this.currentState = State.createClocksState(this.wallClock.rows, this.wallClock.columns)
+        this.targetState = this.currentState
     }
 
     start() {
@@ -25,7 +29,11 @@ export class Choreographer {
     }
 
     private nextState(): State[][] {
-        let { nextState, moving } = this.interpolate(this.animators[this.state].nextState(this.wallClock.rows, this.wallClock.columns))
+        if ((this.targetState == null || !this.animators[this.state].hasFinished()) && this.achievedTargetState){
+            this.targetState = this.animators[this.state].nextState()
+        }
+        let { nextState, moving } = this.interpolate(this.targetState)
+        this.achievedTargetState = !moving
         if (this.animators[this.state].hasFinished() && moving == false) {
             if (this.nextAnimatorTime == null){
                 this.nextAnimatorTime = new Date().getTime() + 1000 * this.animators[this.state].freezeTime
@@ -34,7 +42,8 @@ export class Choreographer {
             else if (this.nextAnimatorTime > new Date().getTime()){
                 return this.currentState
             }
-            this.animators[this.state].restart(this.wallClock.rows, this.wallClock.columns)
+            this.targetState = null
+            this.animators[this.state].restart()
             this.state = (this.state + 1) % this.animators.length
             this.nextAnimatorTime = null
         }
@@ -49,10 +58,10 @@ export class Choreographer {
             for (let x = 0; x < this.wallClock.columns; x++) {
                 let newState = newClockState[y][x]
                 let currentState = this.currentState[y][x]
-                let { interpolatedValue, changed } = this.intepolateValue(currentState.hourRotation, newState.hourRotation)
+                let { interpolatedValue, changed } = this.interpolateValue(currentState.hourRotation, newState.hourRotation)
                 interpolated[y][x] = interpolated[y][x].setHourRotation(interpolatedValue)
                 moving ||= changed;
-                ({ interpolatedValue, changed } = this.intepolateValue(currentState.minRotation, newState.minRotation))
+                ({ interpolatedValue, changed } = this.interpolateValue(currentState.minRotation, newState.minRotation))
                 interpolated[y][x] = interpolated[y][x].setMinRotation(interpolatedValue)
                 moving ||= changed
             }
@@ -60,10 +69,13 @@ export class Choreographer {
         return { nextState: interpolated, moving }
     }
 
-    private intepolateValue(oldValue: number, newValue: number): { interpolatedValue: number, changed: boolean } {
+    private interpolateValue(oldValue: number, newValue: number): { interpolatedValue: number, changed: boolean } {
+        if (oldValue == newValue){
+            return {interpolatedValue: oldValue, changed:false}
+        }
         let clockwiseDist = Math.abs(oldValue - newValue)
-        if (clockwiseDist < this.maxSpeed) {
-            return { interpolatedValue: oldValue, changed: false }
+        if (clockwiseDist < this.minAngleDiff) {
+            return { interpolatedValue: newValue, changed: true }
         }
         let maxV = Math.max(oldValue, newValue)
         let minV = Math.min(oldValue, newValue)
@@ -71,21 +83,11 @@ export class Choreographer {
         let result: number
         let sign: number
         if (clockwiseDist < counterclockwiseDist) { // clockwise
-            if (oldValue < newValue) {
-                sign = 1
-            }
-            else {
-                sign = - 1
-            }
+            sign = (oldValue < newValue) ? 1 : -1
         } else {
-            if (oldValue < newValue) {
-                sign = -1
-            }
-            else {
-                sign = 1
-            }
+            sign = (oldValue < newValue) ? -1 : 1
         }
-        result = oldValue + sign * this.maxSpeed
+        result = oldValue + sign * this.minAngleDiff
         return { interpolatedValue: (result + 2 * Math.PI) % (2 * Math.PI), changed: true } // keep 2pi range
     }
 }

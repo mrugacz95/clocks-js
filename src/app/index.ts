@@ -5,21 +5,31 @@ import { LinesAnimator } from './animators/LinesAnimator';
 import { State } from './animators/Animator';
 import { DigitalHourAnimator } from './animators/DigitalHourAnimator';
 import { WaveAnimator } from "./animators/WaveAnimator";
+import { MagneticLinesAnimator } from "./animators/MagneticLinesAnimator";
+import { ComposeAnimator } from "./animators/ComposeAnimator";
 
 const root = document.getElementById('wall') as HTMLCanvasElement
+const background = document.getElementById('background') as HTMLCanvasElement
 
 
-const app = new WallClock(root,
+const app = new WallClock(
+    root,
+    background,
     [
         new LinesAnimator(State.OFF),
         new WaveAnimator(),
         new DialsHourAnimator(),
-        // new LinesAnimator(new State(0, Math.PI), 0),
-        new LinesAnimator(new State(Math.PI / 2, Math.PI * 3 / 2)),
-        // new LinesAnimator(new State(Math.PI, 0), 0),
-        // new LinesAnimator(new State(Math.PI * 3 / 2, Math.PI / 2), 0),
-        // new LinesAnimator(new State(0, Math.PI)),
-        new DigitalHourAnimator()
+        new ComposeAnimator(
+            [
+                new LinesAnimator(new State(0, Math.PI)),
+                new LinesAnimator(new State(Math.PI / 2, Math.PI * 3 / 2)),
+                new LinesAnimator(new State(Math.PI, 0)),
+                new LinesAnimator(new State(Math.PI * 3 / 2, Math.PI / 2)),
+                new LinesAnimator(new State(0, Math.PI)),
+            ]
+        ),
+        new MagneticLinesAnimator(),
+        new DigitalHourAnimator(),
     ]
 )
 
