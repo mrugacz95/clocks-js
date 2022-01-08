@@ -4,7 +4,7 @@ import { State } from "./Animator"
 export class DialsHourAnimator extends Animator {
     freezeTime = 1.5
 
-    nextState(): State[][] {
+    internalNextState(): State[][] {
         const today = new Date();
         const hours = today.getHours();
         const minutes = today.getMinutes();
@@ -12,9 +12,9 @@ export class DialsHourAnimator extends Animator {
         const minRotation = minutes / 60 * 2 * Math.PI;
 
         let output: State[][] = []
-        for (let y = 0; y < this.rows; y++) {
+        for (let y = 0; y < this.wallClock.rows; y++) {
             output[y] = []
-            for (let x = 0; x < this.columns; x++) {
+            for (let x = 0; x < this.wallClock.columns; x++) {
                 output[y][x] = new State(hourRotation, minRotation)
             }
         }

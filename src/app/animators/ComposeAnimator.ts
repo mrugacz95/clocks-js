@@ -1,4 +1,5 @@
 import { Animator, State } from "./Animator";
+import { WallClock } from "../WallClock";
 
 export class ComposeAnimator extends Animator {
     state: number = 0;
@@ -9,19 +10,19 @@ export class ComposeAnimator extends Animator {
         this.animators = animators
     }
 
-    init(rows: number, columns: number) {
-        super.init(rows, columns);
-        this.animators.forEach((animator) => animator.init(rows, columns))
+    init(wallClick : WallClock) {
+        super.init(wallClick);
+        this.animators.forEach((animator) => animator.init(wallClick))
     }
 
     hasFinished(): boolean {
         return this.state == this.animators.length;
     }
 
-    nextState(): State[][] {
-        let nextState =  this.animators[this.state].nextState();
-        if (this.animators[this.state].hasFinished()){
-            this.state ++
+    internalNextState(): State[][] {
+        let nextState = this.animators[this.state].nextState();
+        if (this.animators[this.state].hasFinished()) {
+            this.state++
         }
         return nextState
     }

@@ -41,14 +41,14 @@ export class DigitalHourAnimator extends Animator {
     cache: State[][]
     cacheDate: Date
 
-    nextState(): State[][] {
+    internalNextState(): State[][] {
         let today = new Date();
         if (this.cacheDate == today) {
             return this.cache
         }
         let hours = today.getHours().toString().padStart(2, '0');
         let minutes = today.getMinutes().toString().padStart(2, '0');
-        let initial = State.createClocksState(this.rows, this.columns)
+        let initial = State.createClocksState(this.wallClock.rows, this.wallClock.columns)
 
         this.drawNumber(new Vector(1, 1), parseInt(hours[0]), initial)
         this.drawNumber(new Vector(1, 4), parseInt(hours[1]), initial)

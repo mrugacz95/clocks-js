@@ -1,25 +1,27 @@
+import { WallClock } from "../WallClock";
+
 export abstract class Animator {
-    protected rows: number
-    protected columns: number
     protected initialized: boolean = false
+    protected wallClock: WallClock
     freezeTime: number
 
     constructor(freezeTime: number = 0) {
         this.freezeTime = freezeTime
     }
 
-    init(rows: number, columns: number) {
-        this.rows = rows
-        this.columns = columns
+    init(wallClock: WallClock) {
+        this.wallClock = wallClock
         this.initialized = true
     }
 
     nextState(): State[][] {
-        if (!this.initialized){
+        if (!this.initialized) {
             throw new DOMException("Animator not initialized")
         }
-        return State.createClocksState(this.rows, this.columns)
+        return this.internalNextState()
     }
+
+    protected abstract internalNextState(): State[][]
 
     abstract hasFinished(): boolean
 
@@ -38,6 +40,10 @@ export class Angle {
 
     static opposite(angle: number) {
         return (angle + 3 * Math.PI) % (2 * Math.PI)
+    }
+
+    static wrap(angle: number) {
+        return (angle + 2 * Math.PI) % (2 * Math.PI)
     }
 }
 

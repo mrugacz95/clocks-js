@@ -7,13 +7,13 @@ export class WaveAnimator extends Animator {
         return true;
     }
 
-    nextState(): State[][] {
-        let state = State.createClocksState(this.rows, this.columns)
-        let delta = Math.PI / this.rows
+    internalNextState(): State[][] {
+        let state = State.createClocksState(this.wallClock.rows, this.wallClock.columns)
+        let delta = Math.PI / this.wallClock.rows
         let rot = 0
-        for (let y = 0; y < this.rows; y++) {
+        for (let y = 0; y < this.wallClock.rows; y++) {
             rot += delta
-            for (let x = 0; x < this.columns; x++) {
+            for (let x = 0; x < this.wallClock.columns; x++) {
                 state[y][x] = new State(rot + Math.PI, rot)
             }
         }

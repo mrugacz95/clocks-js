@@ -1,5 +1,6 @@
 import { Animator, State } from './animators/Animator'
 import { Choreographer } from './Choreographer'
+import { Vector } from "./geometry/Vector";
 
 export class WallClock {
     root: HTMLCanvasElement
@@ -18,6 +19,7 @@ export class WallClock {
     choreographer: Choreographer
     running: boolean = false
     afterFirstDraw = false
+    dialsCenters: Vector[][]
 
     constructor(root: HTMLCanvasElement, background: HTMLCanvasElement, animators: Animator[]) {
         this.root = root
@@ -33,10 +35,20 @@ export class WallClock {
         background.height = window.innerHeight
         this.wallStartX = this.root.width / 2 - this.width / 2
         this.wallStartY = this.root.height / 2 - this.height / 2
-        this.choreographer = new Choreographer(animators, this)
+        this.dialsCenters = []
+        for (let y = 0; y < this.rows; y++) {
+            this.dialsCenters[y] = []
+            for (let x = 0; x < this.columns; x++) {
+                this.dialsCenters[y][x] = new Vector(
+                    y * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartY + this.margin,
+                    x * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartX + this.margin
+                )
+            }
+        }
         animators.forEach((animator: Animator) => {
-            animator.init(this.rows, this.columns)
+            animator.init(this)
         })
+        this.choreographer = new Choreographer(animators, this)
     }
 
     start() {
@@ -124,16 +136,13 @@ export class WallClock {
     }
 
     drawArrows(states: State[][]) {
-
         this.ctx.fillStyle = "#000";
         this.ctx.strokeStyle = "#000"
         for (let y = 0; y < this.rows; y++) {
             for (let x = 0; x < this.columns; x++) {
-
                 this.ctx.lineWidth = 4
                 let state = states[y][x]
-                let clockXCenter = x * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartX + this.margin;
-                let clockYCenter = y * (this.singleClockSize + this.dividerSize) + this.singleClockSize / 2 + this.wallStartY + this.margin
+                let {y: clockYCenter, x: clockXCenter} = this.dialsCenters[y][x]
                 let {arrowY, arrowX} = this.rotateArrow(this.singleClockSize / 2 - 1, state.minRotation)
                 this.ctx.beginPath();
                 this.ctx.moveTo(clockXCenter, clockYCenter);

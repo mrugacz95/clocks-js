@@ -8,11 +8,11 @@ export class LinesAnimator extends Animator {
         this.state = state
     }
 
-    nextState(): State[][] {
+    internalNextState(): State[][] {
         let output: State[][] = []
-        for (let y = 0; y < this.rows; y++) {
+        for (let y = 0; y < this.wallClock.rows; y++) {
             output[y] = []
-            for (let x = 0; x < this.columns; x++) {
+            for (let x = 0; x < this.wallClock.columns; x++) {
                 output[y][x] = this.state
             }
         }
