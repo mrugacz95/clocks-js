@@ -5,7 +5,7 @@ export class Choreographer {
     animators: Animator[]
     state: number
     wallClock: WallClock
-    fps: number = 120
+    fps: number = 60
     currentState: State[][]
     targetState: State[][]
     speed: number = (2 * Math.PI / 15)  // 15 sec for full turn
@@ -30,7 +30,7 @@ export class Choreographer {
 
     private nextState(): State[][] {
         if ((this.targetState == null || !this.animators[this.state].hasFinished()) && this.achievedTargetState){
-            this.targetState = this.animators[this.state].nextState()
+            this.targetState = this.animators[this.state].nextState(this.currentState)
         }
         let { nextState, moving } = this.interpolate(this.targetState)
         this.achievedTargetState = !moving

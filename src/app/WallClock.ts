@@ -4,6 +4,7 @@ import { Vector } from "./geometry/Vector";
 
 export class WallClock {
     root: HTMLCanvasElement
+    background: HTMLCanvasElement
     ctx: CanvasRenderingContext2D
     backgroundCtx: CanvasRenderingContext2D
     backgroundDrawn: boolean = false
@@ -13,26 +14,33 @@ export class WallClock {
     rows: number = 8
     margin: number = 30
     dividerSize: number = 10
-    singleClockSize: number = 60
+    singleClockSize: number
     wallStartX: number
     wallStartY: number
     choreographer: Choreographer
     running: boolean = false
-    afterFirstDraw = false
     dialsCenters: Vector[][]
 
     constructor(root: HTMLCanvasElement, background: HTMLCanvasElement, animators: Animator[]) {
         this.root = root
+        this.background = background
         this.backgroundCtx = background.getContext("2d")
         this.ctx = this.root.getContext("2d")
-        this.width = this.root.width
-        this.height = this.root.height
-        this.width = this.columns * this.singleClockSize + (this.columns - 1) * this.dividerSize + 2 * this.margin
-        this.height = this.rows * this.singleClockSize + (this.rows - 1) * this.dividerSize + 2 * this.margin
+        this.resize()
+        animators.forEach((animator: Animator) => {
+            animator.init(this)
+        })
+        this.choreographer = new Choreographer(animators, this)
+    }
+
+    resize() {
         this.root.width = window.innerWidth;
         this.root.height = window.innerHeight;
-        background.width = window.innerWidth
-        background.height = window.innerHeight
+        this.background.width = window.innerWidth
+        this.background.height = window.innerHeight
+        this.singleClockSize = this.root.width / 30
+        this.width = this.columns * this.singleClockSize + (this.columns - 1) * this.dividerSize + 2 * this.margin
+        this.height = this.rows * this.singleClockSize + (this.rows - 1) * this.dividerSize + 2 * this.margin
         this.wallStartX = this.root.width / 2 - this.width / 2
         this.wallStartY = this.root.height / 2 - this.height / 2
         this.dialsCenters = []
@@ -45,10 +53,8 @@ export class WallClock {
                 )
             }
         }
-        animators.forEach((animator: Animator) => {
-            animator.init(this)
-        })
-        this.choreographer = new Choreographer(animators, this)
+        this.backgroundDrawn = false
+        this.drawBackground()
     }
 
     start() {
@@ -61,20 +67,12 @@ export class WallClock {
     }
 
     drawBackground() {
-        if (this.backgroundDrawn == false) {
-            this.drawBoard(this.backgroundCtx)
-            this.drawDials(this.backgroundCtx)
-            this.backgroundDrawn = true
-        }
+        this.drawBoard(this.backgroundCtx)
+        this.drawDials(this.backgroundCtx)
+        this.backgroundDrawn = true
     }
 
     draw(nextState: State[][]) {
-        this.drawBackground()
-        this.ctx.clearRect(0, 0, this.root.width, this.root.height);
-        this.ctx.save()
-        this.afterFirstDraw = true
-        this.ctx.restore()
-        this.ctx.save()
         this.drawArrows(nextState)
     }
 
@@ -136,6 +134,7 @@ export class WallClock {
     }
 
     drawArrows(states: State[][]) {
+        this.ctx.clearRect(0, 0, this.root.width, this.root.height);
         this.ctx.fillStyle = "#000";
         this.ctx.strokeStyle = "#000"
         for (let y = 0; y < this.rows; y++) {

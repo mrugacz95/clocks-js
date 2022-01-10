@@ -41,7 +41,7 @@ export class DigitalHourAnimator extends Animator {
     cache: State[][]
     cacheDate: Date
 
-    internalNextState(): State[][] {
+    internalNextState(currentState: State[][]): State[][] {
         let today = new Date();
         if (this.cacheDate == today) {
             return this.cache

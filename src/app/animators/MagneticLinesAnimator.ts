@@ -16,7 +16,7 @@ export class MagneticLinesAnimator extends Animator {
         return this.state == this.maxState;
     }
 
-    internalNextState(): State[][] {
+    internalNextState(currentState: State[][]): State[][] {
         if (this.state == 0) {
             this.state++
             return State.createClocksState(this.wallClock.rows, this.wallClock.columns, new State(Angle.DOWN_LEFT, Angle.UP_RIGHT))

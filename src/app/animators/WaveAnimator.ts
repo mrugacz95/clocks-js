@@ -1,13 +1,13 @@
 import { Animator, State } from "./Animator";
 
 export class WaveAnimator extends Animator {
-    freezeTime: number = 2
+    freezeTime: number = 1.2
 
     hasFinished(): boolean {
         return true;
     }
 
-    internalNextState(): State[][] {
+    internalNextState(currentState: State[][]): State[][] {
         let state = State.createClocksState(this.wallClock.rows, this.wallClock.columns)
         let delta = Math.PI / this.wallClock.rows
         let rot = 0

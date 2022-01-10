@@ -8,7 +8,7 @@ export class LinesAnimator extends Animator {
         this.state = state
     }
 
-    internalNextState(): State[][] {
+    internalNextState(currentState: State[][]): State[][] {
         let output: State[][] = []
         for (let y = 0; y < this.wallClock.rows; y++) {
             output[y] = []

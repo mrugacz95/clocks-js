@@ -19,8 +19,8 @@ export class ComposeAnimator extends Animator {
         return this.state == this.animators.length;
     }
 
-    internalNextState(): State[][] {
-        let nextState = this.animators[this.state].nextState();
+    internalNextState(currentState: State[][]): State[][] {
+        let nextState = this.animators[this.state].nextState(currentState);
         if (this.animators[this.state].hasFinished()) {
             this.state++
         }

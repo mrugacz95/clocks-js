@@ -14,14 +14,14 @@ export abstract class Animator {
         this.initialized = true
     }
 
-    nextState(): State[][] {
+    nextState(currentState: State[][]): State[][] {
         if (!this.initialized) {
             throw new DOMException("Animator not initialized")
         }
-        return this.internalNextState()
+        return this.internalNextState(currentState)
     }
 
-    protected abstract internalNextState(): State[][]
+    protected abstract internalNextState(currentState: State[][]): State[][]
 
     abstract hasFinished(): boolean
 

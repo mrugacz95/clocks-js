@@ -4,7 +4,7 @@ import { State } from "./Animator"
 export class DialsHourAnimator extends Animator {
     freezeTime = 1.5
 
-    internalNextState(): State[][] {
+    internalNextState(currentState: State[][]): State[][] {
         const today = new Date();
         const hours = today.getHours();
         const minutes = today.getMinutes();
