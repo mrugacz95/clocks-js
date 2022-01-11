@@ -21,7 +21,7 @@ export class WallClock {
     running: boolean = false
     dialsCenters: Vector[][]
 
-    constructor(root: HTMLCanvasElement, background: HTMLCanvasElement, animators: Animator[]) {
+    constructor(root: HTMLCanvasElement, background: HTMLCanvasElement, label: HTMLDivElement, animators: Animator[]) {
         this.root = root
         this.background = background
         this.backgroundCtx = background.getContext("2d")
@@ -31,6 +31,8 @@ export class WallClock {
             animator.init(this)
         })
         this.choreographer = new Choreographer(animators, this)
+        label.style.left = (this.wallStartX - 200).toString() + "px"
+        label.style.top = (this.wallStartY).toString() + "px"
     }
 
     resize() {

@@ -7,7 +7,7 @@ export class DigitalHourAnimator extends Animator {
         1: [[[0, 1], [0, 2], [5, 2], [5, 1], [1, 1], [1, 0], [0, 1]]],
         2: [[[0, 0], [0, 2], [3, 2], [3, 1], [4, 1], [4, 2], [5, 2], [5, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]]],
         3: [[[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [2, 0], [2, 1], [1, 1], [1, 0], [0, 0]]],
-        4: [[[0, 0], [0, 1], [2, 1], [2, 1] , [0,1], [0,2], [5, 2], [5,1], [3,1], [3,0], [0,0]]],
+        4: [[[0, 0], [0, 1], [2, 1], [2, 1], [0, 1], [0, 2], [5, 2], [5, 1], [3, 1], [3, 0], [0, 0]]],
         // 4: [[[0, 2], [5, 2], [5, 1], [3, 1], [3, 0], [2, 0], [0, 2]]],
         5: [[[0, 0], [3, 0], [3, 1], [4, 1], [4, 0], [5, 0], [5, 2], [2, 2], [2, 1], [1, 1], [1, 2], [0, 2], [0, 0]]],
         6: [
@@ -26,7 +26,10 @@ export class DigitalHourAnimator extends Animator {
         //     [[1, 1], [2, 1], [1, 1]],
         //     [[3, 1], [4, 1], [3, 1]],
         // ],
-        9: [[[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [0, 0]]],
+        9: [
+            [[0, 0], [0, 2], [5, 2], [5, 0], [4, 0], [4, 1], [3, 1], [3, 0], [0, 0]],
+            [[1, 1], [2, 1], [1, 1]]
+        ],
         0: [
             [[0, 0], [0, 2], [5, 2], [5, 0], [0, 0]],
             [[1, 1], [4, 1], [1, 1]]
@@ -54,10 +57,8 @@ export class DigitalHourAnimator extends Animator {
         this.drawNumber(new Vector(1, 4), parseInt(hours[1]), initial)
         this.drawNumber(new Vector(1, 8), parseInt(minutes[0]), initial)
         this.drawNumber(new Vector(1, 11), parseInt(minutes[1]), initial)
-        // initial[2][7] = new State(State.DOWN, State.DOWN)
         initial[3][7] = new State(Angle.UP, Angle.UP)
         initial[4][7] = new State(Angle.UP, Angle.UP)
-        // initial[5][7] = new State(State.UP, State.UP)
 
         this.cache = initial
         return initial

@@ -11,11 +11,13 @@ import { Magnet } from "./animators/Magnet";
 
 const root = document.getElementById('wall') as HTMLCanvasElement
 const background = document.getElementById('background') as HTMLCanvasElement
+const label = document.getElementById('label') as HTMLDivElement
 
 
 const app = new WallClock(
     root,
     background,
+    label,
     [
         new LinesAnimator(State.OFF),
         new WaveAnimator(),
