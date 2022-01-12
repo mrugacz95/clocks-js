@@ -31,20 +31,18 @@ export class WallClock {
             animator.init(this)
         })
         this.choreographer = new Choreographer(animators, this)
-        label.style.left = (this.wallStartX - 200).toString() + "px"
-        label.style.top = (this.wallStartY).toString() + "px"
     }
 
     resize() {
-        this.root.width = window.innerWidth;
-        this.root.height = window.innerHeight;
-        this.background.width = window.innerWidth
-        this.background.height = window.innerHeight
-        this.singleClockSize = this.root.width / 30
+        this.singleClockSize = window.innerWidth / 30
         this.width = this.columns * this.singleClockSize + (this.columns - 1) * this.dividerSize + 2 * this.margin
         this.height = this.rows * this.singleClockSize + (this.rows - 1) * this.dividerSize + 2 * this.margin
-        this.wallStartX = this.root.width / 2 - this.width / 2
-        this.wallStartY = this.root.height / 2 - this.height / 2
+        this.root.width = this.width;
+        this.root.height = this.height;
+        this.background.width = this.width;
+        this.background.height = this.height;
+        this.wallStartX = 0
+        this.wallStartY = 0
         this.dialsCenters = []
         for (let y = 0; y < this.rows; y++) {
             this.dialsCenters[y] = []
@@ -69,7 +67,6 @@ export class WallClock {
     }
 
     drawBackground() {
-        this.drawBoard(this.backgroundCtx)
         this.drawDials(this.backgroundCtx)
         this.backgroundDrawn = true
     }

@@ -5,8 +5,8 @@ export class ComposeAnimator extends Animator {
     state: number = 0;
     private animators: Animator[];
 
-    constructor(animators: Animator[]) {
-        super();
+    constructor(animators: Animator[], freezeTime: number) {
+        super(freezeTime);
         this.animators = animators
     }
 
