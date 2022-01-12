@@ -8,6 +8,7 @@ import { WaveAnimator } from "./animators/WaveAnimator";
 import { MagneticLinesAnimator } from "./animators/MagneticLinesAnimator";
 import { ComposeAnimator } from "./animators/ComposeAnimator";
 import { Magnet } from "./animators/Magnet";
+import { CursorPointerAnimator } from "./animators/CursorPointerAnimator";
 
 const root = document.getElementById('wall') as HTMLCanvasElement
 const background = document.getElementById('background') as HTMLCanvasElement
@@ -32,7 +33,8 @@ const app = new WallClock(
         ),
         new MagneticLinesAnimator(),
         new DigitalHourAnimator(),
-        new Magnet()
+        new Magnet(),
+        new CursorPointerAnimator(0.5)
     ]
 )
 
