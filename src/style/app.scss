@@ -52,8 +52,25 @@ html, body {
   box-shadow: 1px 1px 6px #9d9d9d;
 }
 
+.museum_label + p {
+  margin-top: 0;
+}
+
 .exhibit {
   display: flex;
   position: absolute;
   margin-top: auto;
+}
+
+#qr_code {
+  background: url('~/src/app/assets/qr.jpg');
+  background-size: contain;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 10px;
+}
+
+.no_top {
+  margin-top: 0;
 }

@@ -6,7 +6,7 @@ module.exports = {
     output: {
         path: __dirname + '/dist',
         filename: 'bundle.js',
-        publicPath: '/'
+        publicPath: '/clocks-js/'
     },
     mode: isProduction ? 'production' : 'development',
     module: {
@@ -28,7 +28,6 @@ module.exports = {
                             sourceMap: true,
                         }
                     }
-
                 ]
             },
             {
@@ -52,7 +51,11 @@ module.exports = {
                         }
                     }
                 ]
-            }
+            },
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset/resource',
+            },
         ]
     },
     resolve: {

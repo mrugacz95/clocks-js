@@ -8,7 +8,7 @@ export class Choreographer {
     fps: number = 60
     currentState: State[][]
     targetState: State[][]
-    speed: number = (2 * Math.PI / 15)  // 15 sec for full turn
+    speed: number = (2 * Math.PI / 10)  // 10 sec for full turn
     minAngleDiff: number  = this.speed / this.fps
     nextAnimatorTime ?: number
     freezeTime : number = 0.5

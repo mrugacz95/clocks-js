@@ -9,11 +9,9 @@ import { MagneticLinesAnimator } from "./animators/MagneticLinesAnimator";
 import { ComposeAnimator } from "./animators/ComposeAnimator";
 import { Magnet } from "./animators/Magnet";
 import { CursorPointerAnimator } from "./animators/CursorPointerAnimator";
-
 const root = document.getElementById('wall') as HTMLCanvasElement
 const background = document.getElementById('background') as HTMLCanvasElement
 const label = document.getElementById('label') as HTMLDivElement
-
 
 const app = new WallClock(
     root,
