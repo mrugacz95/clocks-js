@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "test": "jest"
   },
+  "type": "module",
   "keywords": [
     "animation",
     "clock",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^9.2.1",
     "babel-preset-env": "^1.7.0",
@@ -25,6 +28,7 @@
     "html-webpack-plugin": "^5.6.3",
     "lato-font": "^3.0.0",
     "resolve-url-loader": "^5.0.0",
+    "sass": "^1.80.4",
     "sass-loader": "^16.0.2",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.2.6",
@@ -33,6 +37,6 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.1.0",
     "webpack-merge": "^6.0.1",
-    "sass": "^1.80.4"
+    "ts-jest": "^29.2.5"
   }
 }
