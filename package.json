@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback",
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.cjs",
     "test": "jest"
   },
   "type": "module",

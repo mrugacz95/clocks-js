@@ -1,12 +1,12 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
-    entry: __dirname + "/src/main/index.ts",
+    entry: __dirname + "/src/app/index.ts",
     output: {
         path: __dirname + '/dist',
         filename: 'bundle.js',
-        publicPath: '/clocks-js/'
+        publicPath: isProduction ? '/clocks-js/' : '/'
     },
     mode: isProduction ? 'production' : 'development',
     module: {
